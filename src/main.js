@@ -22,12 +22,12 @@ function saveConfig(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-function getImsPropsFromConfig(config) {
+function getImsPropsFromConfig(config, options = {}) {
   return {
     imsClientId: config.imsClientId || '',
     imsScope: config.imsScope || 'AdobeID,openid,additional_info.projectedProductContext,read_organizations',
     redirectUrl: config.redirectUrl || window.location.href,
-    modalMode: true,
+    modalMode: options.inPopup ? false : true,
     onImsServiceInitialized: (service) => console.log('IMS initialized', service),
     onAccessTokenReceived: (token) => console.log('Access token received'),
     onAccessTokenExpired: () => console.warn('Access token expired'),
@@ -35,28 +35,37 @@ function getImsPropsFromConfig(config) {
   };
 }
 
-function registerImsAuth(config) {
+function registerImsAuth(config, options = {}) {
   if (typeof PureJSSelectors === 'undefined') {
     console.error('PureJSSelectors not loaded. Asset Selector script may have failed.');
     return null;
   }
-  const imsProps = getImsPropsFromConfig(config);
+  const imsProps = getImsPropsFromConfig(config, options);
   imsInstance = PureJSSelectors.registerAssetsSelectorsAuthService(imsProps);
   return imsInstance;
 }
 
-// When this page loads in a popup (IMS OAuth callback or auth flow), we must only run
-// the IMS registration so the Adobe library can process the callback and close the popup.
-// Do not render the full app in the popup.
+// When this page loads in a popup (IMS OAuth flow), we only run IMS registration.
+// If URL has no callback params yet, call signIn() to redirect this window to Adobe sign-in.
+// After sign-in, Adobe redirects back here with token; we register again and the library processes it and closes the popup.
+function isImsCallbackUrl() {
+  const h = window.location.hash || '';
+  const q = window.location.search || '';
+  return /access_token|code=|error=/.test(h + q);
+}
+
 if (window.opener) {
   const app = document.getElementById('app');
   if (app) app.style.display = 'none';
-  document.body.innerHTML = '<p style="padding:2rem;font-family:system-ui;text-align:center;">Completing sign-in…</p>';
+  const isCallback = isImsCallbackUrl();
+  document.body.innerHTML = '<p style="padding:2rem;font-family:system-ui;text-align:center;">' + (isCallback ? 'Completing sign-in…' : 'Redirecting to sign-in…') + '</p>';
   const config = getConfig();
   if (config && config.imsClientId && config.imsOrg && typeof PureJSSelectors !== 'undefined') {
-    registerImsAuth(config);
+    const service = registerImsAuth(config, { inPopup: true });
+    if (!isCallback && service && typeof service.signIn === 'function') {
+      service.signIn();
+    }
   }
-  // Let the IMS library handle the URL (callback params) and close the popup.
 } else {
   // Main window: run the full app below.
 }
