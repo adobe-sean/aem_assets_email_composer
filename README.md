@@ -54,18 +54,18 @@ The app is intended to be deployed on **GitHub Pages** only.
   npm run build
   ```
 
-  Output is in the `dist/` folder. The app uses `base: './'` in Vite so it works when served from a subpath (e.g. `https://username.github.io/repo-name/`).
+  Output is in the `dist/` folder. The app uses `base: '/aem_assets_email_composer/'` so it works at `https://adobe-sean.github.io/aem_assets_email_composer/`. If you rename the repo, update `base` in `vite.config.js` to match.
 
 - **Deploy to GitHub Pages**
 
   1. Push the repo to GitHub.
   2. In the repo go to **Settings → Pages**.
-  3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-  4. Push to `main` (or run the “Deploy to GitHub Pages” workflow manually). The included workflow builds the app and deploys the `dist/` folder.
+  3. Under **Build and deployment**, set **Source** to **GitHub Actions** (required for this app).
+  4. Push to `main` (or run the “Deploy to GitHub Pages” workflow manually). The workflow builds the app and deploys the `dist/` folder.
 
-  **Alternative (branch deploy):** run `npm run build`, commit the contents of `dist/` to a `gh-pages` branch or a `docs/` folder, then in **Settings → Pages** choose **Deploy from a branch** and select that branch/folder.
+  **Important:** Add the **exact URL** where the app is served (e.g. `https://adobe-sean.github.io/aem_assets_email_composer/`) to your IMS client’s **allowed redirect URLs** so the Asset Selector login works.
 
-  **Important:** Add the **exact URL** where the app is served (e.g. `https://yourusername.github.io/aem-asset-selector-poc/`) to your IMS client’s **allowed redirect URLs** so the Asset Selector login works.
+- **Getting a 404?** Use **GitHub Actions** as the Pages source. If Source is "Deploy from a branch", GitHub serves the raw repo (no built `index.html` at root), so you get 404. Set **Source** to **GitHub Actions**, push to `main` or run the workflow from the **Actions** tab, then reload the site after the workflow completes.
 
 ## Project structure
 

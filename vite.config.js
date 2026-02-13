@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite';
 
-// GitHub Pages: use repo name as base if deploying to username.github.io/repo-name
+// GitHub Pages project site: https://adobe-sean.github.io/aem_assets_email_composer/
+// Base must match the repo path so asset URLs resolve correctly.
 export default defineConfig({
-  base: './',
+  base: '/aem_assets_email_composer/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
