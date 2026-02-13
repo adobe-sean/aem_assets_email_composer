@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Composer – AEM Asset Selector POC</title>
+  <link rel="stylesheet" href="/src/main.css" />
+  <!-- AEM Micro-Frontend Asset Selector (UMD) -->
+  <script src="https://experience.adobe.com/solutions/CQ-assets-selectors/static-assets/resources/assets-selectors.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>Email Composer</h1>
+      <p class="subtitle">Insert images from AEM Assets using the Micro-Frontend Asset Selector</p>
+      <button type="button" id="config-btn" class="btn btn-ghost" aria-label="Configuration">⚙️ Config</button>
+    </header>
+
+    <main class="composer">
+      <div class="composer-toolbar">
+        <button type="button" id="insert-image-btn" class="btn btn-primary">
+          📷 Insert image from AEM
+        </button>
+      </div>
+      <div class="composer-fields">
+        <label class="field">
+          <span>To</span>
+          <input type="email" id="to" placeholder="recipient@example.com" />
+        </label>
+        <label class="field">
+          <span>Subject</span>
+          <input type="text" id="subject" placeholder="Email subject" />
+        </label>
+        <label class="field field-body">
+          <span>Body</span>
+          <div id="body" class="body-editor" contenteditable="true" data-placeholder="Write your email… You can insert images from AEM using the button above."></div>
+        </label>
+      </div>
+    </main>
+
+    <!-- Config panel (collapsible) -->
+    <aside id="config-panel" class="config-panel" hidden>
+      <h2>AEM Asset Selector configuration</h2>
+      <p class="config-hint">Provide the IMS credentials from your provisioned AEM Assets as a Cloud Service profile. Your app URL must be in the IMS client’s allowed redirect URLs.</p>
+      <form id="config-form" class="config-form">
+        <label class="field">
+          <span>IMS Client ID</span>
+          <input type="text" id="imsClientId" name="imsClientId" placeholder="Your imsClientId" />
+        </label>
+        <label class="field">
+          <span>IMS Scope</span>
+          <input type="text" id="imsScope" name="imsScope" value="AdobeID,openid,additional_info.projectedProductContext,read_organizations" />
+        </label>
+        <label class="field">
+          <span>IMS Org</span>
+          <input type="text" id="imsOrg" name="imsOrg" placeholder="e.g. 9D0725C05E44FE1A0A49411C@AdobeOrg" />
+        </label>
+        <label class="field">
+          <span>Redirect URL</span>
+          <input type="url" id="redirectUrl" name="redirectUrl" placeholder="Leave empty to use current page URL" />
+        </label>
+        <label class="field">
+          <span>Repository ID (optional)</span>
+          <input type="text" id="repositoryId" name="repositoryId" placeholder="Leave empty for default" />
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" id="config-close" class="btn btn-ghost">Close</button>
+        </div>
+      </form>
+    </aside>
+
+    <!-- Asset Selector modal -->
+    <dialog id="asset-selector-dialog" class="asset-selector-dialog">
+      <div id="asset-selector" class="asset-selector-container"></div>
+    </dialog>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
