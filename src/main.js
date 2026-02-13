@@ -9,16 +9,6 @@ const RENDITION_LINK = 'http://ns.adobe.com/adobecloud/rel/rendition';
 let imsInstance = null;
 let assetSelectorRendered = false;
 
-// DOM
-const configBtn = document.getElementById('config-btn');
-const configPanel = document.getElementById('config-panel');
-const configForm = document.getElementById('config-form');
-const configClose = document.getElementById('config-close');
-const insertImageBtn = document.getElementById('insert-image-btn');
-const bodyEditor = document.getElementById('body');
-const assetSelectorContainer = document.getElementById('asset-selector');
-const assetSelectorDialog = document.getElementById('asset-selector-dialog');
-
 function getConfig() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -54,6 +44,32 @@ function registerImsAuth(config) {
   imsInstance = PureJSSelectors.registerAssetsSelectorsAuthService(imsProps);
   return imsInstance;
 }
+
+// When this page loads in a popup (IMS OAuth callback or auth flow), we must only run
+// the IMS registration so the Adobe library can process the callback and close the popup.
+// Do not render the full app in the popup.
+if (window.opener) {
+  const app = document.getElementById('app');
+  if (app) app.style.display = 'none';
+  document.body.innerHTML = '<p style="padding:2rem;font-family:system-ui;text-align:center;">Completing sign-in…</p>';
+  const config = getConfig();
+  if (config && config.imsClientId && config.imsOrg && typeof PureJSSelectors !== 'undefined') {
+    registerImsAuth(config);
+  }
+  // Let the IMS library handle the URL (callback params) and close the popup.
+} else {
+  // Main window: run the full app below.
+}
+
+// DOM (only used when not in popup; refs are safe either way)
+const configBtn = document.getElementById('config-btn');
+const configPanel = document.getElementById('config-panel');
+const configForm = document.getElementById('config-form');
+const configClose = document.getElementById('config-close');
+const insertImageBtn = document.getElementById('insert-image-btn');
+const bodyEditor = document.getElementById('body');
+const assetSelectorContainer = document.getElementById('asset-selector');
+const assetSelectorDialog = document.getElementById('asset-selector-dialog');
 
 /** Get the first usable image URL from a selected asset (rendition or self link). */
 function getAssetImageUrl(asset) {
@@ -191,4 +207,6 @@ function init() {
   });
 }
 
-init();
+if (!window.opener) {
+  init();
+}
